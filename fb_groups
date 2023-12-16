@@ -281,7 +281,7 @@ const fbGroups = {
             members: fbGroups.members
         };
 
-        const jsonData = JSON.stringify(groupObj);
+        const jsonData = JSON.stringify(groupObj, null, 4);
         const file = new Blob([jsonData], {
             type: 'text/json',
             endings: 'native'
