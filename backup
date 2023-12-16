@@ -122,7 +122,6 @@ const fbGroups = {
                         } catch (error) {
                             error = error;
                         }
-                        alert("and son of gays");
                         if (fbGroups.membersElms.length >= membersCount) {
                             fbGroups.membersElms = fbGroups.membersElms.slice(0, membersCount);
                             fbGroups.successGetMembersDataCB();
