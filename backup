@@ -151,7 +151,7 @@ const fbGroups = {
                     mutual: '',
                     worksAt: '',
                     from: '',
-                    followersCount: -1,
+                    followers: '',
                     bornOn: '',
                     additionalInfo: '',
                     url: ''
@@ -178,8 +178,12 @@ const fbGroups = {
                         {
                             bornOn: ['born', 'on'],
                             splitor: 'Born on'
-                            
+
                         },
+                        {
+                            followers: ['followed', 'by'],
+                            splitor: 'Followed by'
+                        }
                     ];
                     if (links.length >= 2) {
                         // get member href
@@ -193,7 +197,7 @@ const fbGroups = {
                                 // name
                                 member['name'] = memberMetaInfo;
                             } else {
-
+                                let foundVal = false;
                                 // other info
                                 for (let k = 0; k < memberDataKeys.length; k++) {
                                     const keyObj = memberDataKeys[k];
@@ -208,19 +212,39 @@ const fbGroups = {
                                             member[prop] = splitedInfo;
                                             mainInfo.push(memberMetaInfo);
                                             console.log(memberMetaInfo, validTargetMeta, searchTxts);
-                                            alert(splitedInfo);
+                                            foundVal = true;
                                             break;
                                         }
                                     } else {
                                         continue;
                                     }
                                 }
-                                // other info ends
+                                if (!foundVal) {
+                                    // get from
+                                    const validTargetMeta = fbGroups.simpleAiText(['From'], memberMetaInfo, true);
+                                    if (validTargetMeta) {
+                                        foundVal = true;
+                                        member['from'] = memberMetaInfo.split('From').join("");
+                                    }
+                                    if (!foundVal) {
+                                        // get aditional info
+                                        if (!additionalInfo.includes(memberMetaInfo) && memberMetaInfo != 'Add friend') {
+                                            additionalInfo.push(memberMetaInfo);
+                                        }
+
+                                    }
+                                    // other info ends
+                                }
+
                             }
+
                         } else {
                             continue;
                         }
 
+                    }
+                    if (additionalInfo.length > 0) {
+                        member['additionalInfo'] = additionalInfo.join(",");
                     }
                     const isUniqueMember = fbGroups.isUniqueMember(member);
                     if (isUniqueMember) {
