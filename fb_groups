@@ -2,6 +2,37 @@ const fbGroups = {
     memebrsText: [],
     membersElms: [],
     timeout1: null,
+    simpleAiText: function(searchTxts = [], text = '', charsAndNumbers = true) {
+        try {
+            let plainSearch = [];
+            let match = [];
+            searchTxts.forEach((searchWord) => {
+                plainSearch.push(String(searchWord).toLocaleLowerCase().trim());
+            });
+            const plainTxt = String(text).toLowerCase().trim();
+            const tokinzeList = plainTxt.split(" ");
+            for (let i = 0; i < tokinzeList.length; i++) {
+                let currentWord = tokinzeList[i];
+                if (charsAndNumbers) {
+                    // \w replace none chars and numbers when match word with simple AI
+                    currentWord = currentWord.replace(/[^a-z0-9]/gi, '');
+                }
+                if (!match.includes(currentWord) && plainSearch.includes(currentWord)) {
+                    match.push(currentWord);
+                } else {
+                    console.log(currentWord);
+                }
+            }
+            if (match.length == searchTxts.length) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.warn(error, 'unknown error');
+            return false;
+        }
+    },
     getElementByText: (targetText = '', parentSelector = '') => {
         let target = null;
         const spans = document.querySelectorAll(`${parentSelector} span`);
