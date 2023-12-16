@@ -128,6 +128,7 @@ const fbGroups = {
                 name: '',
                 liveIn: '',
                 studiedAt: '',
+                mutual: '',
                 worksAt: '',
                 from: '',
                 followersCount: -1,
@@ -141,18 +142,31 @@ const fbGroups = {
                     const currentTxt = currentElm.innerText;
                     const links = currentElm.querySelectorAll("a");
                     const additionalInfo = [];
+                    const memberDataKeys = [{
+                            liveIn: ['lives', 'in']
+                        }, {
+                            mutual: ['mutual', 'friend']
+                        }, {
+                            worksAt: ['works', 'at']
+                        }, {
+                            studiedAt: ['studied', 'at']
+                        },
+                        {
+                            bornOn: ['born', 'on']
+                        },
+                    ];
                     if (links.length >= 2) {
                         member['url'] = links[1].href;
                     }
                     const splitedMemberTxt = currentTxt.split("\n");
-                    for (let m=0; m<splitedMemberTxt.length; m++){
+                    for (let m = 0; m < splitedMemberTxt.length; m++) {
                         const memberMetaInfo = splitedMemberTxt[m];
-                        if (memberMetaInfo){
-                            if (m==0){
+                        if (memberMetaInfo) {
+                            if (m == 0) {
                                 // name
                                 member['name'] = memberMetaInfo;
                             } else {
-                                
+
                             }
                         } else {
                             continue;
