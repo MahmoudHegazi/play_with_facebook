@@ -122,21 +122,59 @@ const fbGroups = {
         }
     },
     successGetMembersDataCB: function() {
-        console.log("here is your target members", fbGroups.membersElms);
-        const member = {name: '', liveIn: '', studiedAt: '', worksAt: '', from: '', followersCount: -1, bornOn: '', additionalInfo: '', url: ''};
-        for (let i=0; i<fbGroups.membersElms.length; i++) {
-            const currentElm = membersElms;
-            const currentTxt = currentElm.innerText;
-            const links = 
+        try {
+            console.log("here is your target members", fbGroups.membersElms);
+            const member = {
+                name: '',
+                liveIn: '',
+                studiedAt: '',
+                worksAt: '',
+                from: '',
+                followersCount: -1,
+                bornOn: '',
+                additionalInfo: '',
+                url: ''
+            };
+            for (let i = 0; i < fbGroups.membersElms.length; i++) {
+                try {
+                    const currentElm = membersElms;
+                    const currentTxt = currentElm.innerText;
+                    const links = currentElm.querySelectorAll("a");
+                    const additionalInfo = [];
+                    if (links.length >= 2) {
+                        member['url'] = links[1].href;
+                    }
+                    const splitedMemberTxt = currentTxt.split("\n");
+                    for (let m=0; m<splitedMemberTxt.length; m++){
+                        const memberMetaInfo = splitedMemberTxt[m];
+                        if (memberMetaInfo){
+                            if (m==0){
+                                // name
+                                member['name'] = memberMetaInfo;
+                            } else {
+                                
+                            }
+                        } else {
+                            continue;
+                        }
+                    }
+                } catch (error) {
+                    console.log("error while geting member data");
+                    continue;
+                }
+            }
+
+            return fbGroups.membersElms;
+        } catch (error) {
+            console.log("bot error", error);
+            fbGroups.systemErrorCb();
         }
-        
-        return fbGroups.membersElms;
     },
     errorGetMembersDataCB: (error = '') => {
         console.log(error);
         return false;
     },
     systemErrorCb: () => {
-        console.log("app has error please contact us");
+        console.log("bot has code error, or fb changed something, please contact us");
     }
 }
