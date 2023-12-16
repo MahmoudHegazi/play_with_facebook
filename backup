@@ -102,7 +102,6 @@ const fbGroups = {
                         } catch (error) {
                             error = error;
                         }
-                        alert("and son of gays");
                         if (fbGroups.membersElms.length >= membersCount) {
                             fbGroups.membersElms = fbGroups.membersElms.slice(0, membersCount);
                             fbGroups.successGetMembersDataCB();
@@ -186,12 +185,14 @@ const fbGroups = {
                                 }
                                 // other info ends
                             }
+                            console.log("eh yabn el mtnka", currentElm);
                         } else {
                             continue;
                         }
-                        fbGroups.members.push(member);
+                        
                     }
                     // member end
+                    fbGroups.members.push(member);
                 } catch (error) {
                     console.log("error while geting member data");
                     continue;
