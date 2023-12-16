@@ -167,6 +167,19 @@ const fbGroups = {
                                 member['name'] = memberMetaInfo;
                             } else {
 
+                                // other info
+                                for (let k = 0; k < memberDataKeys.length; k++) {
+                                    const keyObj = memberDataKeys[k];
+                                    const objKeys = Object.keys(keyObj);
+                                    if (objKeys.length > 0) {
+                                        const prop = objKeys[0];
+                                        const searchTxts = memberDataKeys[prop];
+                                        const validTargetMeta = fbGroups.simpleAiText(searchTxts, memberMetaInfo, true);
+
+                                    } else {
+                                        continue;
+                                    }
+                                }
                             }
                         } else {
                             continue;
