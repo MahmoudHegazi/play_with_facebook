@@ -1,0 +1,31 @@
+const fbGroups = {
+    timeout1: null,
+    getElementByText: (targetText = '', parentSelector = '') => {
+        let target = null;
+        const spans = document.querySelectorAll(`${parentSelector} span`);
+        for (let i = 0; i < spans.length; i++) {
+            const currentText = String(spans[i].innerText).replace(" ", "").trim().toLowerCase();
+
+            if (currentText == targetText) {
+                target = spans[i];
+                break;
+            }
+        }
+        return target;
+    },
+    getGroupMembers: () => {
+        const peopleBtn = this.getElementByText('people', "[role='main']");
+        if (peopleBtn) {
+            peopleBtn.click();
+            if (this.timeout1) {
+                clearTimeout(this.timeout1);
+            }
+            this.timeout1 = setTimeout(() => {
+                const seeAllBtn = fbGroups.getElementByText('seeall', "[role='main']");
+                if (seeAllBtn) {
+                    seeAllBtn.click();
+                }
+            }, 5000);
+        }
+    }
+}
