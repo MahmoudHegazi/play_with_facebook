@@ -20,8 +20,6 @@ const fbGroups = {
                 }
                 if (!match.includes(currentWord) && plainSearch.includes(currentWord)) {
                     match.push(currentWord);
-                } else {
-                    console.log(currentWord);
                 }
             }
             if (match.length == searchTxts.length) {
@@ -46,6 +44,28 @@ const fbGroups = {
             }
         }
         return target;
+    },
+    isUniqueMember: function(member) {
+        let found = false;
+        for (let i = 0; i < fbGroups.members.length; i++) {
+            let index = 0;
+            let props = 0;
+            const existMember = fbGroups.members[i];
+            for (let prop in member) {
+                props += 1;
+                if (existMember.hasOwnProperty(prop)) {
+                    if (member[prop] === existMember[prop]) {
+                        index += 1;
+                    }
+                }
+            }
+            if (index == props) {
+                return false;
+                break
+            }
+
+        }
+        return true;
     },
     getMemebers: (waitFor = 3000) => {
         if (isNaN(parseInt(waitFor))) {
@@ -166,7 +186,6 @@ const fbGroups = {
                             if (m == 0) {
                                 // name
                                 member['name'] = memberMetaInfo;
-                                
                             } else {
 
                                 // other info
@@ -187,14 +206,18 @@ const fbGroups = {
                                 }
                                 // other info ends
                             }
-                            console.log("eh yabn el mtnka", currentElm);
                         } else {
                             continue;
                         }
-                        
+
+                    }
+                    const isUniqueMember = fbGroups.isUniqueMember(member);
+                    if (isUniqueMember) {
+                        fbGroups.members.push(member);
+                    } else {
+                        continue
                     }
                     // member end
-                    fbGroups.members.push(member);
                 } catch (error) {
                     console.log("error while geting member data");
                     continue;
