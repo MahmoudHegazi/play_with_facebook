@@ -105,11 +105,13 @@ const fbGroups = {
             if (this.timeout1) {
                 clearTimeout(fbGroups.timeout1);
             }
-            this.timeout1 = setTimeout(async () => {
+            fbGroups.timeout1 = setTimeout(() => {
                 try {
                     const seeAllBtn = fbGroups.getElementByText('seeall', "[role='main']");
                     if (seeAllBtn) {
                         seeAllBtn.click();
+                    }
+                    setTimeout(async () => {
                         // fb as tested with Powershell he block first or second click loop will confiuse him
                         let error = '';
                         try {
@@ -129,11 +131,7 @@ const fbGroups = {
                             const errorMsg = (error) ? error : `unable to get target members now try again later max gotten is ${fbGroups.membersElms.length}`;
                             fbGroups.errorGetMembersDataCB(errorMsg);
                         }
-
-                    } else {
-                        console.log("facebook changed selectors contact us");
-                        return false;
-                    }
+                    }, 3000);
                 } catch (error) {
                     fbGroups.systemErrorCb();
                 }
