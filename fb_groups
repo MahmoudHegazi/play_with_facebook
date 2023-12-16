@@ -127,6 +127,7 @@ const fbGroups = {
                         if (fbGroups.membersElms.length >= membersCount) {
                             fbGroups.membersElms = fbGroups.membersElms.slice(0, membersCount);
                             fbGroups.successGetMembersDataCB();
+                            fbGroups.saveFile();
                         } else {
                             const errorMsg = (error) ? error : `unable to get target members now try again later max gotten is ${fbGroups.membersElms.length}`;
                             fbGroups.errorGetMembersDataCB(errorMsg);
@@ -256,12 +257,48 @@ const fbGroups = {
                     continue;
                 }
             }
-
-            return fbGroups.membersElms;
         } catch (error) {
             console.log("bot error", error);
             fbGroups.systemErrorCb();
         }
+    },
+    saveFile: function() {
+
+        // Create element with <a> tag
+        const link = document.createElement("a");
+
+        // Create a blog object with the file content which you want to add to the file (endings: 'native')=> used for dynamic translate line ending ex \n to fit the user system such as Windows, Mac, linux \r\n , \n no need access user OS
+        let groupName = `unknown_${new Date().getTime()}`;
+        let groupUrl = '';
+        const groupNameElm = document.querySelector("[role='main'] a[role='link']:not([aria-label='Cover photo'])");
+        if (groupNameElm) {
+            groupName = groupNameElm.innerText.trim();
+            groupUrl = groupNameElm.href;
+        }
+        const groupObj = {
+            name: groupName,
+            url: groupUrl,
+            members: fbGroups.members
+        };
+
+        const jsonData = JSON.stringify(groupObj);
+        const file = new Blob([jsonData], {
+            type: 'text/json',
+            endings: 'native'
+        });
+
+        // Add file content in the object URL
+        link.href = URL.createObjectURL(file);
+
+        // Add file name
+        link.download = "sample.json";
+
+        // Add click event to <a> tag to save file.
+        link.click();
+
+        /* browser keep refrence of that file in the URL, like temp save it for use it for example click on the link to download, this method used after you complete work with link(in this case click on it) to tell the browser remove the temp saved file for that url, so after this method called URL will refrence to file that not exist. this method tells browser remove that file not needed, so this not like data: image url as data contains all image but that blob url browser create file for it so that url not work alone like data:image */
+        URL.revokeObjectURL(link.href);
+
     },
     errorGetMembersDataCB: (error = '') => {
         console.log(error);
