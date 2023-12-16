@@ -1,4 +1,6 @@
 const fbGroups = {
+    memebrsText: [],
+    members: [],
     timeout1: null,
     getElementByText: (targetText = '', parentSelector = '') => {
         let target = null;
@@ -13,19 +15,74 @@ const fbGroups = {
         }
         return target;
     },
-    getGroupMembers: () => {
-        const peopleBtn = this.getElementByText('people', "[role='main']");
+    getMemebers: (waitFor = 3000) => {
+        if (isNaN(parseInt(waitFor))) {
+            return false;
+        }
+        return new Promise((res, rej) => {
+            setTimeout(() => {
+                const currentTargets = document.querySelectorAll("[role='main'] [role='list'] [role='listitem']");
+                let haveUnique = false;
+                let count = 0;
+                for (let i = 0; i < currentTargets.length; i++) {
+                    const currentMemeber = currentTargets[i];
+                    const currentMemeberTxt = currentMemeber.innerText.trim();
+                    if (!fbGroups.memebrsText.includes(currentMemeberTxt)) {
+                        fbGroups.members.push(currentMemeber);
+                        fbGroups.memebrsText.push(currentMemeberTxt);
+                        count += 1;
+                    }
+                }
+                if (count) {
+                    res(fbGroups.members);
+                } else {
+                    rej();
+                }
+            }, waitFor);
+        })
+    },
+    getGroupMembers: function(membersCount = 10, waitForScroll = 3000) {
+        const secuirtyLooping = membersCount * 10;
+        const peopleBtn = fbGroups.getElementByText('people', "[role='main']");
         if (peopleBtn) {
             peopleBtn.click();
             if (this.timeout1) {
-                clearTimeout(this.timeout1);
+                clearTimeout(fbGroups.timeout1);
             }
-            this.timeout1 = setTimeout(() => {
+            this.timeout1 = setTimeout(async () => {
                 const seeAllBtn = fbGroups.getElementByText('seeall', "[role='main']");
                 if (seeAllBtn) {
                     seeAllBtn.click();
+                    // pass fancy noob security
+                    let error = '';
+                    try {
+                        for (let i = 0; i < secuirtyLooping; i++) {
+                            if (fbGroups.members.lenth >= membersCount) {
+                                break;
+                            }
+                            const getMembers = await fbGroups.getMemebers(waitForScroll);
+                        }
+                    } catch (error) {
+                        error = error;
+                    }
+                    if (fbGroups.members.length >= membersCount) {
+                        fbGroups.members = fbGroups.members.slice(0, membersCount);
+                        fbGroups.successGetMembersDataCB();
+                    } else {
+                        const errorMsg = (error) ? error : `unable to get target members now try again later max gotten is ${fbGroups.members.length}`;
+                        fbGroups.errorGetMembersDataCB(errorMsg);
+                    }
+
                 }
             }, 5000);
         }
+    },
+    successGetMembersDataCB: function() {
+        console.log("here is your target members", fbGroups.members);
+        return fbGroups.members;
+    },
+    errorGetMembersDataCB: (error = '') => {
+        console.log(error);
+        return false;
     }
 }
