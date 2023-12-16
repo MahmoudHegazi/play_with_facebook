@@ -124,19 +124,19 @@ const fbGroups = {
     successGetMembersDataCB: function() {
         try {
             console.log("here is your target members", fbGroups.membersElms);
-            const member = {
-                name: '',
-                liveIn: '',
-                studiedAt: '',
-                mutual: '',
-                worksAt: '',
-                from: '',
-                followersCount: -1,
-                bornOn: '',
-                additionalInfo: '',
-                url: ''
-            };
             for (let i = 0; i < fbGroups.membersElms.length; i++) {
+                const member = {
+                    name: '',
+                    liveIn: '',
+                    studiedAt: '',
+                    mutual: '',
+                    worksAt: '',
+                    from: '',
+                    followersCount: -1,
+                    bornOn: '',
+                    additionalInfo: '',
+                    url: ''
+                };
                 try {
                     const currentElm = membersElms;
                     const currentTxt = currentElm.innerText;
@@ -175,16 +175,21 @@ const fbGroups = {
                                         const prop = objKeys[0];
                                         const searchTxts = memberDataKeys[prop];
                                         const validTargetMeta = fbGroups.simpleAiText(searchTxts, memberMetaInfo, true);
-
+                                        if (validTargetMeta) {
+                                            member[prop] = memberMetaInfo;
+                                        }
                                     } else {
                                         continue;
                                     }
                                 }
+                                // other info ends
                             }
                         } else {
                             continue;
                         }
+                        fbGroups.members.push();
                     }
+                    // member end
                 } catch (error) {
                     console.log("error while geting member data");
                     continue;
