@@ -163,19 +163,26 @@ const fbGroups = {
                     const additionalInfo = [];
                     const mainInfo = [];
                     const memberDataKeys = [{
-                            liveIn: ['lives', 'in']
+                            liveIn: ['lives', 'in'],
+                            splitor: 'Lives in'
                         }, {
-                            mutual: ['mutual', 'friend']
+                            mutual: ['mutual', 'friend'],
+                            splitor: 'mutual friend:'
                         }, {
-                            worksAt: ['works', 'at']
+                            worksAt: ['works', 'at'],
+                            splitor: 'Works at'
                         }, {
-                            studiedAt: ['studied', 'at']
+                            studiedAt: ['studied', 'at'],
+                            splitor: 'Studied at'
                         },
                         {
-                            bornOn: ['born', 'on']
+                            bornOn: ['born', 'on'],
+                            splitor: 'Born on'
+                            
                         },
                     ];
                     if (links.length >= 2) {
+                        // get member href
                         member['url'] = links[1].href;
                     }
                     const splitedMemberTxt = currentTxt.split("\n");
@@ -191,13 +198,18 @@ const fbGroups = {
                                 for (let k = 0; k < memberDataKeys.length; k++) {
                                     const keyObj = memberDataKeys[k];
                                     const objKeys = Object.keys(keyObj);
-                                    if (objKeys.length > 0) {
+                                    if (objKeys.length >= 2) {
                                         const prop = objKeys[0];
-                                        const searchTxts = memberDataKeys[prop];
+                                        const splitor = memberDataKeys[k][objKeys[1]];
+                                        const searchTxts = memberDataKeys[k][prop];
                                         const validTargetMeta = fbGroups.simpleAiText(searchTxts, memberMetaInfo, true);
                                         if (validTargetMeta && !mainInfo.includes(memberMetaInfo)) {
-                                            member[prop] = memberMetaInfo;
+                                            const splitedInfo = memberMetaInfo.split(splitor).join("");
+                                            member[prop] = splitedInfo;
                                             mainInfo.push(memberMetaInfo);
+                                            console.log(memberMetaInfo, validTargetMeta, searchTxts);
+                                            alert(splitedInfo);
+                                            break;
                                         }
                                     } else {
                                         continue;
