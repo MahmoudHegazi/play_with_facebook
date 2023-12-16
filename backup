@@ -1,0 +1,142 @@
+const fbGroups = {
+    memebrsText: [],
+    membersElms: [],
+    members: [],
+    timeout1: null,
+    simpleAiText: function(searchTxts = [], text = '', charsAndNumbers = true) {
+        try {
+            let plainSearch = [];
+            let match = [];
+            searchTxts.forEach((searchWord) => {
+                plainSearch.push(String(searchWord).toLocaleLowerCase().trim());
+            });
+            const plainTxt = String(text).toLowerCase().trim();
+            const tokinzeList = plainTxt.split(" ");
+            for (let i = 0; i < tokinzeList.length; i++) {
+                let currentWord = tokinzeList[i];
+                if (charsAndNumbers) {
+                    // \w replace none chars and numbers when match word with simple AI
+                    currentWord = currentWord.replace(/[^a-z0-9]/gi, '');
+                }
+                if (!match.includes(currentWord) && plainSearch.includes(currentWord)) {
+                    match.push(currentWord);
+                } else {
+                    console.log(currentWord);
+                }
+            }
+            if (match.length == searchTxts.length) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.warn(error, 'unknown error');
+            return false;
+        }
+    },
+    getElementByText: (targetText = '', parentSelector = '') => {
+        let target = null;
+        const spans = document.querySelectorAll(`${parentSelector} span`);
+        for (let i = 0; i < spans.length; i++) {
+            const currentText = String(spans[i].innerText).replace(" ", "").trim().toLowerCase();
+
+            if (currentText == targetText) {
+                target = spans[i];
+                break;
+            }
+        }
+        return target;
+    },
+    getMemebers: (waitFor = 3000) => {
+        if (isNaN(parseInt(waitFor))) {
+            return false;
+        }
+        return new Promise((res, rej) => {
+            setTimeout(() => {
+                try {
+                    const currentTargets = document.querySelectorAll("[role='main'] [role='list'] [role='listitem']");
+                    let haveUnique = false;
+                    let count = 0;
+                    for (let i = 0; i < currentTargets.length; i++) {
+                        const currentMemeber = currentTargets[i];
+                        const currentMemeberTxt = currentMemeber.innerText.trim();
+                        if (!fbGroups.memebrsText.includes(currentMemeberTxt)) {
+                            fbGroups.membersElms.push(currentMemeber);
+                            fbGroups.memebrsText.push(currentMemeberTxt);
+                            count += 1;
+                        }
+                    }
+                    if (count) {
+                        res(fbGroups.membersElms);
+                    } else {
+                        rej();
+                    }
+                } catch {
+                    rej();
+                }
+            }, waitFor);
+        })
+    },
+    getGroupMembers: function(membersCount = 10, waitForScroll = 3000) {
+        const secuirtyLooping = membersCount * 10;
+        const peopleBtn = fbGroups.getElementByText('people', "[role='main']");
+        if (peopleBtn) {
+            peopleBtn.click();
+            if (this.timeout1) {
+                clearTimeout(fbGroups.timeout1);
+            }
+            this.timeout1 = setTimeout(async () => {
+                try {
+                    const seeAllBtn = fbGroups.getElementByText('seeall', "[role='main']");
+                    if (seeAllBtn) {
+                        seeAllBtn.click();
+                        // fb as tested with Powershell he block first or second click loop will confiuse him
+                        let error = '';
+                        try {
+                            for (let i = 0; i < secuirtyLooping; i++) {
+                                if (fbGroups.membersElms.lenth >= membersCount) {
+                                    break;
+                                }
+                                const getMembers = await fbGroups.getMemebers(waitForScroll);
+                            }
+                        } catch (error) {
+                            error = error;
+                        }
+                        alert("and son of gays");
+                        if (fbGroups.membersElms.length >= membersCount) {
+                            fbGroups.membersElms = fbGroups.membersElms.slice(0, membersCount);
+                            fbGroups.successGetMembersDataCB();
+                        } else {
+                            const errorMsg = (error) ? error : `unable to get target members now try again later max gotten is ${fbGroups.membersElms.length}`;
+                            fbGroups.errorGetMembersDataCB(errorMsg);
+                        }
+
+                    } else {
+                        console.log("facebook changed selectors contact us");
+                        return false;
+                    }
+                } catch (error) {
+                    fbGroups.systemErrorCb();
+                }
+            }, 5000);
+        }
+    },
+    successGetMembersDataCB: function() {
+        console.log("here is your target members", fbGroups.membersElms);
+        const member = {name: '', liveIn: '', studiedAt: '', worksAt: '', from: '', followersCount: -1, bornOn: '', additionalInfo: '', url: ''};
+        for (let i=0; i<fbGroups.membersElms.length; i++) {
+            const currentElm = membersElms;
+            const currentTxt = currentElm.innerText;
+            const links = 
+        }
+        
+        return fbGroups.membersElms;
+    },
+    errorGetMembersDataCB: (error = '') => {
+        console.log(error);
+        return false;
+    },
+    systemErrorCb: () => {
+        console.log("app has error please contact us");
+    }
+}
