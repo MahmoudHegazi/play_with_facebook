@@ -138,10 +138,11 @@ const fbGroups = {
                     url: ''
                 };
                 try {
-                    const currentElm = membersElms;
+                    const currentElm = fbGroups.membersElms[i];
                     const currentTxt = currentElm.innerText;
                     const links = currentElm.querySelectorAll("a");
                     const additionalInfo = [];
+                    const props = [];
                     const memberDataKeys = [{
                             liveIn: ['lives', 'in']
                         }, {
@@ -175,7 +176,7 @@ const fbGroups = {
                                         const prop = objKeys[0];
                                         const searchTxts = memberDataKeys[prop];
                                         const validTargetMeta = fbGroups.simpleAiText(searchTxts, memberMetaInfo, true);
-                                        if (validTargetMeta) {
+                                        if (validTargetMeta && !props.includes(prop)) {
                                             member[prop] = memberMetaInfo;
                                         }
                                     } else {
@@ -187,7 +188,7 @@ const fbGroups = {
                         } else {
                             continue;
                         }
-                        fbGroups.members.push();
+                        fbGroups.members.push(member);
                     }
                     // member end
                 } catch (error) {
