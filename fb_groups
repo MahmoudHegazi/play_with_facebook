@@ -1,6 +1,7 @@
 const fbGroups = {
     memebrsText: [],
     membersElms: [],
+    members: [],
     timeout1: null,
     simpleAiText: function(searchTxts = [], text = '', charsAndNumbers = true) {
         try {
@@ -19,8 +20,6 @@ const fbGroups = {
                 }
                 if (!match.includes(currentWord) && plainSearch.includes(currentWord)) {
                     match.push(currentWord);
-                } else {
-                    console.log(currentWord);
                 }
             }
             if (match.length == searchTxts.length) {
@@ -45,6 +44,28 @@ const fbGroups = {
             }
         }
         return target;
+    },
+    isUniqueMember: function(member) {
+        let found = false;
+        for (let i = 0; i < fbGroups.members.length; i++) {
+            let index = 0;
+            let props = 0;
+            const existMember = fbGroups.members[i];
+            for (let prop in member) {
+                props += 1;
+                if (existMember.hasOwnProperty(prop)) {
+                    if (member[prop] === existMember[prop]) {
+                        index += 1;
+                    }
+                }
+            }
+            if (index == props) {
+                return false;
+                break
+            }
+
+        }
+        return true;
     },
     getMemebers: (waitFor = 3000) => {
         if (isNaN(parseInt(waitFor))) {
@@ -120,14 +141,135 @@ const fbGroups = {
         }
     },
     successGetMembersDataCB: function() {
-        console.log("here is your target members", fbGroups.membersElms);
-        return fbGroups.membersElms;
+        try {
+            console.log("here is your target members", fbGroups.membersElms);
+            for (let i = 0; i < fbGroups.membersElms.length; i++) {
+                const member = {
+                    name: '',
+                    liveIn: '',
+                    studiedAt: '',
+                    mutual: '',
+                    worksAt: '',
+                    from: '',
+                    followers: '',
+                    bornOn: '',
+                    additionalInfo: '',
+                    url: ''
+                };
+                try {
+                    const currentElm = fbGroups.membersElms[i];
+                    const currentTxt = currentElm.innerText;
+                    const links = currentElm.querySelectorAll("a");
+                    const additionalInfo = [];
+                    const mainInfo = [];
+                    const memberDataKeys = [{
+                            liveIn: ['lives', 'in'],
+                            splitor: 'Lives in'
+                        }, {
+                            mutual: ['mutual', 'friend'],
+                            splitor: 'mutual friend:'
+                        }, {
+                            worksAt: ['works', 'at'],
+                            splitor: 'Works at'
+                        }, {
+                            studiedAt: ['studied', 'at'],
+                            splitor: 'Studied at'
+                        },
+                        {
+                            bornOn: ['born', 'on'],
+                            splitor: 'Born on'
+
+                        },
+                        {
+                            followers: ['followed', 'by'],
+                            splitor: 'Followed by'
+                        }
+                    ];
+                    if (links.length >= 2) {
+                        // get member href
+                        member['url'] = links[1].href;
+                    }
+                    const splitedMemberTxt = currentTxt.split("\n");
+                    for (let m = 0; m < splitedMemberTxt.length; m++) {
+                        const memberMetaInfo = splitedMemberTxt[m];
+                        if (memberMetaInfo) {
+                            if (m == 0) {
+                                // name
+                                member['name'] = memberMetaInfo;
+                            } else {
+                                let foundVal = false;
+                                // other info
+                                for (let k = 0; k < memberDataKeys.length; k++) {
+                                    const keyObj = memberDataKeys[k];
+                                    const objKeys = Object.keys(keyObj);
+                                    if (objKeys.length >= 2) {
+                                        const prop = objKeys[0];
+                                        const splitor = memberDataKeys[k][objKeys[1]];
+                                        const searchTxts = memberDataKeys[k][prop];
+                                        const validTargetMeta = fbGroups.simpleAiText(searchTxts, memberMetaInfo, true);
+                                        if (validTargetMeta && !mainInfo.includes(memberMetaInfo)) {
+                                            const splitedInfo = memberMetaInfo.split(splitor).join("");
+                                            member[prop] = splitedInfo;
+                                            mainInfo.push(memberMetaInfo);
+                                            console.log(memberMetaInfo, validTargetMeta, searchTxts);
+                                            foundVal = true;
+                                            break;
+                                        }
+                                    } else {
+                                        continue;
+                                    }
+                                }
+                                if (!foundVal) {
+                                    // get from
+                                    const validTargetMeta = fbGroups.simpleAiText(['From'], memberMetaInfo, true);
+                                    if (validTargetMeta) {
+                                        foundVal = true;
+                                        member['from'] = memberMetaInfo.split('From').join("");
+                                    }
+                                    if (!foundVal) {
+                                        // get aditional info
+                                        if (!additionalInfo.includes(memberMetaInfo) && memberMetaInfo != 'Add friend') {
+                                            additionalInfo.push(memberMetaInfo);
+                                        }
+
+                                    }
+                                    // other info ends
+                                }
+
+                            }
+
+                        } else {
+                            continue;
+                        }
+
+                    }
+                    if (additionalInfo.length > 0) {
+                        member['additionalInfo'] = additionalInfo.join(",");
+                    }
+                    const isUniqueMember = fbGroups.isUniqueMember(member);
+                    if (isUniqueMember) {
+                        fbGroups.members.push(member);
+                    } else {
+                        continue
+                    }
+                    // member end
+                } catch (error) {
+                    console.log("error while geting member data");
+                    continue;
+                }
+            }
+
+            return fbGroups.membersElms;
+        } catch (error) {
+            console.log("bot error", error);
+            fbGroups.systemErrorCb();
+        }
     },
     errorGetMembersDataCB: (error = '') => {
         console.log(error);
         return false;
     },
     systemErrorCb: () => {
-        console.log("app has error please contact us");
+        console.log("bot has code error, or fb changed something, please contact us");
     }
 }
